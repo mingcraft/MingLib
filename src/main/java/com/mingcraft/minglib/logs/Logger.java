@@ -97,7 +97,7 @@ public class Logger {
             getLogger(key).upload();
         }
         else {
-            throw new CallUnregisteredLoggerException("로거가 등록되지 않아 Mongo 서버에 업로드할 수 없습니다.");
+            throw new CallUnregisteredLoggerException("The file cannot be uploaded to MongoDB server because the logger is not registered.");
         }
     }
 
@@ -118,21 +118,21 @@ public class Logger {
             getLogger(key).disableLogger();
         }
         else {
-            throw new CallUnregisteredLoggerException("등록되지 않은 로거이므로 삭제할 수 없습니다.");
+            throw new CallUnregisteredLoggerException("It cannot be deleted because it is an unregistered logger.");
         }
     }
 
     private static void registerLogger(final String key, final String path){
         if (path == null) {
-            throw new LoggerRegisterFailedException("로그를 작성할 파일의 경로를 찾을 수 없습니다.");
+            throw new LoggerRegisterFailedException("You did not enter the path of the log file.");
         }
         if (isLinkedFile(path)) {
-            throw new LoggerRegisterFailedException("다른 로거와 연결된 파일이므로 연결할 수 없습니다.");
+            throw new LoggerRegisterFailedException("It's already a file linked to another logger.");
         }
         try {
             LOGGERS.put(key, new Logger(key, ROOT_DIR + path));
         } catch (IOException e) {
-            throw new LoggerRegisterFailedException("입력한 경로의 파일을 찾을 수 없습니다.");
+            throw new LoggerRegisterFailedException("The file does not exist in the path.");
         }
     }
 
