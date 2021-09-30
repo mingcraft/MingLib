@@ -15,9 +15,10 @@ import java.util.regex.Pattern;
  *  - Add String colored Method <br>
  *  - Add String uncolored Method <br>
  *  - Add defined hex color <br>
- *
  *  <br>
- * @version 1.0.0
+ *  Version 1.0.1 <br>
+ *  - Add log color <br>
+ *  <br>
  * @author Lede
  */
 public class Color {
@@ -138,7 +139,7 @@ public class Color {
     }
 
     /**
-     * Defined Hex Colors <br>
+     * Defined hex colors <br>
      * If you want other hex color, visit here
      * @see <a href="https://encycolorpedia.kr/">Encycolorpedia</a>
      */
@@ -198,4 +199,19 @@ public class Color {
         String PINK = "&#ff3399";
     }
 
+    /**
+     * Hex colors used in logger
+     */
+    public interface LogColor {
+        String ERROR = "&#ff0000";
+        String WARNING = "&#ffff00";
+        String ENABLE = "&#bfff00";
+        String DISABLE = "&#dc143c";
+        String LOAD = "&#83dcb7";
+        String UNLOAD = "&#f29886";
+        String SAVE = "&#0080ff";
+        String DELETE = "&#ff3399";
+        String MESSAGE = "&#f5f5dc";
+        String INFO = "&#ffd700";
+    }
 }
