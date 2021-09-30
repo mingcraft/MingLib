@@ -118,7 +118,7 @@ public class Logger {
             getLogger(key).disableLogger();
         }
         else {
-            throw new CallUnregisteredLoggerException("등록되지 않은 로거입니다.");
+            throw new CallUnregisteredLoggerException("등록되지 않은 로거이므로 삭제할 수 없습니다.");
         }
     }
 
