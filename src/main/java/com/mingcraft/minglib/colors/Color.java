@@ -1,4 +1,4 @@
-package com.mingcraft.minglib.color;
+package com.mingcraft.minglib.colors;
 
 import net.md_5.bungee.api.ChatColor;
 
