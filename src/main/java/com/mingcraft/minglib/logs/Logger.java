@@ -11,7 +11,10 @@ import org.bukkit.command.ConsoleCommandSender;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -40,12 +43,12 @@ public class Logger {
     private static final Map<String, Logger> LOGGERS = new HashMap<>();
 
     private static final String ROOT_DIR = "log/";
+    private static final DateTimeFormatter TIME_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm:ss");
     private static final String LOG_FORMAT = "[%s] [%s] : %s\n";
 
     private static final ConsoleCommandSender sender = Bukkit.getConsoleSender();
 
     private final String key;
-    private final String path;
     private final File file;
     private boolean sendConsole;
 
@@ -53,30 +56,30 @@ public class Logger {
 
     private Logger() {
         this.key = null;
-        this.path = null;
         this.file = null;
         this.sendConsole = false;
         this.writer = null;
     }
 
-    private Logger(String key, String path) throws FileNotFoundException {
+    private Logger(String key, String path) throws IOException {
         this.key = key;
-        this.path = path;
-
-        this.file = new File(this.path);
-        if (!this.file.exists()) {
-            this.file.mkdirs();
-        }
-
+        this.file = new File(path);
         this.sendConsole = false;
-        this.writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(this.file)));
+
+        if (!file.exists()) {
+            file.getParentFile().mkdirs();
+            file.createNewFile();
+        }
+        this.writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(this.file, true)));
     }
 
     public void log(LogType logType, String message) {
-        String log = String.format(LOG_FORMAT, logType.toString(), LocalDateTime.now(), message);
+        LocalDateTime time = LocalDateTime.now();
+        String log = String.format(LOG_FORMAT, TIME_FORMAT.format(time), logType.toString(), message);
         try {
             if (writer != null)
                 writer.write(log);
+                writer.flush();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -128,7 +131,7 @@ public class Logger {
         }
         try {
             LOGGERS.put(key, new Logger(key, ROOT_DIR + path));
-        } catch (FileNotFoundException e) {
+        } catch (IOException e) {
             throw new LoggerRegisterFailedException("입력한 경로의 파일을 찾을 수 없습니다.");
         }
     }
@@ -138,9 +141,9 @@ public class Logger {
     }
 
     private static boolean isLinkedFile(String path) {
-        String logFilePath = ROOT_DIR + path;
+        File file = new File(ROOT_DIR + path);
         for (Logger logger : LOGGERS.values()) {
-            if (logger.getPath().equals(logFilePath)) {
+            if (logger.getFile().equals(file)) {
                 return true;
             }
         }
