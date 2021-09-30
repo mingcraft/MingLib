@@ -1,0 +1,7 @@
+name: MingLib
+version: '${version}'
+main: com.mingcraft.minglib.MingLib
+api-version: 1.17
+authors: [ Lede, gclogs ]
+description: Mingcraft library for minecraft server
+website: https://github.com/mingcraft/MingLib
