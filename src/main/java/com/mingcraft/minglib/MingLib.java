@@ -7,10 +7,13 @@ public final class MingLib extends JavaPlugin {
     @Override
     public void onEnable() {
 
+
     }
 
     @Override
     public void onDisable() {
 
     }
+
+
 }
