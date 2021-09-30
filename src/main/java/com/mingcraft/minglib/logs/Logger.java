@@ -97,7 +97,7 @@ public class Logger {
             getLogger(key).upload();
         }
         else {
-            throw new CallUnregisteredLoggerException("The file cannot be uploaded to MongoDB server because the logger is not registered.");
+            throw new CallUnregisteredLoggerException("File cannot be uploaded to MongoDB server, Logger is not registered.");
         }
     }
 
@@ -118,7 +118,7 @@ public class Logger {
             getLogger(key).disableLogger();
         }
         else {
-            throw new CallUnregisteredLoggerException("It cannot be deleted because it is an unregistered logger.");
+            throw new CallUnregisteredLoggerException("Cannot be deleted, It is an unregistered logger.");
         }
     }
 
@@ -127,12 +127,12 @@ public class Logger {
             throw new LoggerRegisterFailedException("You did not enter the path of the log file.");
         }
         if (isLinkedFile(path)) {
-            throw new LoggerRegisterFailedException("It's already a file linked to another logger.");
+            throw new LoggerRegisterFailedException("File already linked to another logger.");
         }
         try {
             LOGGERS.put(key, new Logger(key, ROOT_DIR + path));
         } catch (IOException e) {
-            throw new LoggerRegisterFailedException("The file does not exist in the path.");
+            throw new LoggerRegisterFailedException("File does not exist.");
         }
     }
 
