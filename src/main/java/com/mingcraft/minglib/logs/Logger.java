@@ -167,7 +167,6 @@ public class Logger {
     public static Logger getLogger(@NonNull final String key, @Nullable final String path) {
         if (!isRegistered(key)) {
             registerLogger(key, path);
-            return LOGGERS.get(key);
         }
         return LOGGERS.get(key);
     }
