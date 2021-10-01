@@ -11,16 +11,25 @@ import org.bukkit.command.ConsoleCommandSender;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.*;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Minecraft Server Logger <br>
+ * <br>
+ * Version 1.0.1 <br>
+ * - Initialize logger <br>
+ * <br>
+ * @author Lede
+ */
 @Getter
 public class Logger {
 
+    /**
+     * Log type used in logger
+     */
     @Getter
     @AllArgsConstructor
     public enum LogType {
@@ -40,18 +49,34 @@ public class Logger {
 
     }
 
-    private static final Map<String, Logger> LOGGERS = new HashMap<>();
-
     private static final String ROOT_DIR = "log/";
     private static final DateTimeFormatter TIME_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm:ss");
     private static final String LOG_FORMAT = "[%s] [%s] : %s\n";
-
     private static final ConsoleCommandSender sender = Bukkit.getConsoleSender();
 
+    /**
+     * Registered logger map
+     */
+    private static final Map<String, Logger> LOGGERS = new HashMap<>();
+
+    /**
+     * Logger key
+     */
     private final String key;
+
+    /**
+     * Logger's log file
+     */
     private final File file;
+
+    /**
+     * Whether to print the log to the console or not.
+     */
     private boolean sendConsole;
 
+    /**
+     * Log file writer
+     */
     private final BufferedWriter writer;
 
     private Logger() {
@@ -61,6 +86,12 @@ public class Logger {
         this.writer = null;
     }
 
+    /**
+     * Create new logger with key and file path
+     * @param key Logger key
+     * @param path Log file path
+     * @throws IOException Throw when file not create or not found
+     */
     private Logger(String key, String path) throws IOException {
         this.key = key;
         this.file = new File(path);
@@ -73,6 +104,11 @@ public class Logger {
         this.writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(this.file, true)));
     }
 
+    /**
+     * Log message in logger's log file
+     * @param logType Log level
+     * @param message Log message
+     */
     public void log(LogType logType, String message) {
         LocalDateTime time = LocalDateTime.now();
         String log = String.format(LOG_FORMAT, TIME_FORMAT.format(time), logType.toString(), message);
@@ -88,10 +124,18 @@ public class Logger {
         }
     }
 
+    /**
+     * Sets whether the logger outputs logs to the console.
+     * @param sendConsole true or false
+     */
     public void setConsoleSender(boolean sendConsole) {
         this.sendConsole = sendConsole;
     }
 
+    /**
+     * Upload logger's log file to MongoDB
+     * @param key Logger key
+     */
     public static void uploadMongo(String key) {
         if (isRegistered(key)) {
             getLogger(key).upload();
@@ -101,10 +145,25 @@ public class Logger {
         }
     }
 
+    /**
+     * Get registered logger <br>
+     * If logger is unregistered. throw CallUnregisteredLoggerException <br>
+     * @see CallUnregisteredLoggerException
+     * @param key Logger key
+     * @return Logger
+     */
     public static Logger getLogger(@NonNull final String key) {
         return getLogger(key, null);
     }
 
+    /**
+     * Get registered logger or new logger with key and log file path <br>
+     * If path is null or already used. throw LoggerRegisterFailedException <br>
+     * @see LoggerRegisterFailedException
+     * @param key Logger key
+     * @param path Log file path
+     * @return Logger
+     */
     public static Logger getLogger(@NonNull final String key, @Nullable final String path) {
         if (!isRegistered(key)) {
             registerLogger(key, path);
@@ -113,6 +172,10 @@ public class Logger {
         return LOGGERS.get(key);
     }
 
+    /**
+     * Unregister the logger
+     * @param key Logger key
+     */
     public static void removeLogger(@NonNull final String key) {
         if (isRegistered(key)) {
             getLogger(key).disableLogger();
