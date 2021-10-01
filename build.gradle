@@ -68,6 +68,12 @@ shadowJar {
     destinationDirectory = file(env.JAR_DIR.value)
 }
 
+allprojects {
+    repositories {
+        maven { url "https://jitpack.io" }
+    }
+}
+
 publishing {
     repositories {
         maven {
