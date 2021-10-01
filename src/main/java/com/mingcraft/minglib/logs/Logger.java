@@ -1,15 +1,14 @@
 package com.mingcraft.minglib.logs;
 
 import com.mingcraft.minglib.colors.Color;
+import com.mingcraft.minglib.db.MongoDB;
 import com.mingcraft.minglib.exceptions.log.CallUnregisteredLoggerException;
 import com.mingcraft.minglib.exceptions.log.LoggerRegisterFailedException;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NonNull;
 import org.bukkit.Bukkit;
 import org.bukkit.command.ConsoleCommandSender;
 import org.jetbrains.annotations.Nullable;
 
+import javax.annotation.Nonnull;
 import java.io.*;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -24,14 +23,11 @@ import java.util.Map;
  * <br>
  * @author Lede
  */
-@Getter
 public class Logger {
 
     /**
      * Log type used in logger
      */
-    @Getter
-    @AllArgsConstructor
     public enum LogType {
 
         ERROR(Color.LogColor.ERROR),
@@ -46,6 +42,14 @@ public class Logger {
         INFO(Color.LogColor.INFO);
 
         private final String color;
+
+        LogType(String color) {
+            this.color = color;
+        }
+
+        public String getColor() {
+            return color;
+        }
 
     }
 
@@ -119,7 +123,7 @@ public class Logger {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        if (isSendConsole()) {
+        if (sendConsole) {
             sender.sendMessage(Color.colored(logType.color + log));
         }
     }
@@ -136,9 +140,9 @@ public class Logger {
      * Upload logger's log file to MongoDB
      * @param key Logger key
      */
-    public static void uploadMongo(String key) {
+    public static void uploadMongo(String key, String collectionKey) {
         if (isRegistered(key)) {
-            getLogger(key).upload();
+            getLogger(key).upload(collectionKey);
         }
         else {
             throw new CallUnregisteredLoggerException("File cannot be uploaded to MongoDB server, Logger is not registered.");
@@ -152,7 +156,7 @@ public class Logger {
      * @param key Logger key
      * @return Logger
      */
-    public static Logger getLogger(@NonNull final String key) {
+    public static Logger getLogger(@Nonnull final String key) {
         return getLogger(key, null);
     }
 
@@ -164,7 +168,7 @@ public class Logger {
      * @param path Log file path
      * @return Logger
      */
-    public static Logger getLogger(@NonNull final String key, @Nullable final String path) {
+    public static Logger getLogger(@Nonnull final String key, @Nullable final String path) {
         if (!isRegistered(key)) {
             registerLogger(key, path);
         }
@@ -175,7 +179,7 @@ public class Logger {
      * Unregister the logger
      * @param key Logger key
      */
-    public static void removeLogger(@NonNull final String key) {
+    public static void removeLogger(@Nonnull final String key) {
         if (isRegistered(key)) {
             getLogger(key).disableLogger();
         }
@@ -198,22 +202,27 @@ public class Logger {
         }
     }
 
-    private static boolean isRegistered(@NonNull final String key) {
+    private static boolean isRegistered(@Nonnull final String key) {
         return LOGGERS.containsKey(key);
     }
 
     private static boolean isLinkedFile(String path) {
         File file = new File(ROOT_DIR + path);
         for (Logger logger : LOGGERS.values()) {
-            if (logger.getFile().equals(file)) {
+            if (logger.file.equals(file)) {
                 return true;
             }
         }
         return false;
     }
 
-    private void upload() {
-        //TODO Create MongoDB Upload Method
+    private void upload(String collectionKey) {
+        MongoDB db = MongoDB.getMongoDB(collectionKey);
+        try {
+            db.uploadFile(file);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
     }
 
     private void disableLogger() {
@@ -230,6 +239,18 @@ public class Logger {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public File getFile() {
+        return file;
+    }
+
+    public String getKey() {
+        return key;
+    }
+
+    public boolean isSendConsole() {
+        return sendConsole;
     }
 
 }
