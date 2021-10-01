@@ -28,9 +28,6 @@ dependencies {
 
     implementation 'org.mongodb:mongodb-driver-sync:4.3.2'
     implementation 'org.junit.jupiter:junit-jupiter:5.8.1'
-
-    implementation 'org.projectlombok:lombok:1.18.20'
-    annotationProcessor 'org.projectlombok:lombok:1.18.20'
 }
 
 processResources {
@@ -45,30 +42,6 @@ processResources {
 task replaceVersionInREADME {
     ant.replaceregexp(match:'com\\.mingcraft\\:minglib\\:([0-9\\.]+)', replace:"com.mingcraft:minglib:${version}", flags:'g', byline:true) {
         fileset(dir: '.', includes: 'README.md')
-    }
-}
-
-task delombok {
-    description 'Delomboks the entire source code tree'
-    def srcDelomboked = 'docs'
-    def srcJava = 'src'
-
-    inputs.files file( srcJava )
-    outputs.dir file( srcDelomboked )
-
-    doLast {
-        def collection = files( configurations.compile + configurations.testCompile )
-        def sumTree = collection + fileTree( dir: 'bin' )
-
-        ant.taskdef( name: 'delombok', classname: 'lombok.delombok.ant.DelombokTask',
-                classpath: configurations.compile.asPath +
-                        configurations.testCompile.asPath )
-        ant.delombok( from:srcJava, to:srcDelomboked, classpath: sumTree.asPath )
-
-        copy {
-            from srcDelomboked
-            into srcJava
-        }
     }
 }
 
