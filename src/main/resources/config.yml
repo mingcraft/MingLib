@@ -1,0 +1,7 @@
+MongoDB:
+  Ip: "localhost"
+  Port: 27017
+  UseAtlas: false
+  AtlasConnectionString: ""
+  Database: "MingLib"
+
