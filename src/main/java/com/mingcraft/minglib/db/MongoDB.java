@@ -167,8 +167,9 @@ public class MongoDB {
      */
     public Document downloadOne(String key, Object value) {
         Document document = collection.find(Filters.eq(key, value)).first();
-        assert document != null;
-        callMongoDownloadFinishEvent(this.key, collection, new ArrayList<>() {{add(document);}}, getPlayerKey(document));
+        if (document != null) {
+            callMongoDownloadFinishEvent(this.key, collection, new ArrayList<>() {{add(document);}}, getPlayerKey(document));
+        }
         return document;
     }
 
@@ -184,7 +185,9 @@ public class MongoDB {
         while (cursor.hasNext()) {
             documents.add(cursor.next());
         }
-        callMongoDownloadFinishEvent(this.key, collection, documents, getPlayerKey(documents.get(0)));
+        if (documents.size() > 0) {
+            callMongoDownloadFinishEvent(this.key, collection, documents, getPlayerKey(documents.get(0)));
+        }
         return documents;
     }
 
@@ -199,7 +202,9 @@ public class MongoDB {
         while (cursor.hasNext()) {
             documents.add(cursor.next());
         }
-        callMongoDownloadFinishEvent(this.key, collection, documents, getPlayerKey(documents.get(0)));
+        if (documents.size() > 0) {
+            callMongoDownloadFinishEvent(this.key, collection, documents, getPlayerKey(documents.get(0)));
+        }
         return documents;
     }
 
@@ -213,7 +218,9 @@ public class MongoDB {
         while (cursor.hasNext()) {
             documents.add(cursor.next());
         }
-        callMongoDownloadFinishEvent(this.key, collection, documents, getPlayerKey(documents.get(0)));
+        if (documents.size() > 0) {
+            callMongoDownloadFinishEvent(this.key, collection, documents, getPlayerKey(documents.get(0)));
+        }
         return documents;
     }
 
