@@ -1,7 +1,6 @@
 package com.mingcraft.minglib.logs;
 
 import com.mingcraft.minglib.colors.Color;
-import com.mingcraft.minglib.db.MongoDB;
 import com.mingcraft.minglib.exceptions.log.CallUnregisteredLoggerException;
 import com.mingcraft.minglib.exceptions.log.LoggerRegisterFailedException;
 import org.bukkit.Bukkit;
@@ -137,19 +136,6 @@ public class Logger {
     }
 
     /**
-     * Upload logger's log file to MongoDB
-     * @param key Logger key
-     */
-    public static void uploadMongo(String key, String collectionKey) {
-        if (isRegistered(key)) {
-            getLogger(key).upload(collectionKey);
-        }
-        else {
-            throw new CallUnregisteredLoggerException("File cannot be uploaded to MongoDB server, Logger is not registered.");
-        }
-    }
-
-    /**
      * Get registered logger <br>
      * If logger is unregistered. throw CallUnregisteredLoggerException <br>
      * @see CallUnregisteredLoggerException
@@ -214,15 +200,6 @@ public class Logger {
             }
         }
         return false;
-    }
-
-    private void upload(String collectionKey) {
-        MongoDB db = MongoDB.getMongoDB(collectionKey);
-        try {
-            db.uploadFile(file);
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
     }
 
     private void disableLogger() {
