@@ -15,16 +15,15 @@ public class Mson<T> {
     private Class<T> clazz;
 
     public Mson(String path, Class<T> clazz) {
-        setPath(path);
-        setData(null);
-        setClazz(clazz);
+        this.path = path;
+        this.data = null;
+        this.clazz = clazz;
     }
 
-    @SuppressWarnings("unchecked")
     public Mson(String path, T data) {
-        setPath(path);
-        setData(data);
-        setClazz((Class<T>) data.getClass());
+        this.path = path;
+        this.data = data;
+        this.clazz = (Class<T>) data.getClass();
     }
 
     public Mson<T> updateData(T data) {
