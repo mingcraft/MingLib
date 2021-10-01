@@ -214,7 +214,7 @@ public class Logger {
     }
 
     private void upload() {
-        //TODO MongoDB Upload Method 작성할 것
+        //TODO Create MongoDB Upload Method
     }
 
     private void disableLogger() {
