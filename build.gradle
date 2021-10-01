@@ -48,7 +48,7 @@ processResources {
 }
 
 task replaceVersionInREADME {
-    ant.replaceregexp(match:'com\\.mingcraft\\:minglib\\:([0-9\\.]+)', replace:"com.mingcraft:minglib:${version}", flags:'g', byline:true) {
+    ant.replaceregexp(match:'com\\.github.mingcraft\\:minglib\\:([0-9\\.]+)', replace:"com.github.mingcraft:minglib:${version}", flags:'g', byline:true) {
         fileset(dir: '.', includes: 'README.md')
     }
 }
