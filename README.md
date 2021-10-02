@@ -11,6 +11,6 @@ allprojects {
 ```
 ```java
 dependencies {
-    implementation 'com.github.mingcraft:minglib:1.0.5'
+    implementation 'com.github.mingcraft:minglib:1.0.6'
 }
 ```
