@@ -115,8 +115,7 @@ public class Logger {
      * @param message Log message
      */
     public void log(LogType logType, String message) {
-        LocalDateTime time = LocalDateTime.now();
-        String log = String.format(LOG_FORMAT, TIME_FORMAT.format(time), logType.toString(), message);
+        String log = String.format(LOG_FORMAT, Logger.now(), logType.toString(), message);
         try {
             if (writer != null)
                 writer.write(log);
@@ -233,6 +232,10 @@ public class Logger {
 
     public boolean isSendConsole() {
         return sendConsole;
+    }
+
+    public static String now() {
+        return TIME_FORMAT.format(LocalDateTime.now());
     }
 
     private static void callLoggerRegisteredEvent(String key, Logger logger) {
