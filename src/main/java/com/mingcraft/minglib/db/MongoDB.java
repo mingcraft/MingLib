@@ -275,6 +275,7 @@ public class MongoDB {
 
     public static void registerMongoDB() {
         boolean useAtlas = MingLib.config.getBoolean("MongoDB.UseAtlas");
+        Bukkit.getConsoleSender().sendMessage("[MingLib] Use Atlas : " + useAtlas);
         try {
             if (useAtlas) {
                 registerWithAtlas();
@@ -302,15 +303,6 @@ public class MongoDB {
         setupDatabase();
     }
 
-    private static void registerCollection(String key) {
-        MongoDB mongo = new MongoDB(key);
-        COLLECTION_MAP.put(key, mongo);
-    }
-
-    private static void clearCollections() {
-        COLLECTION_MAP.clear();
-    }
-
     private static void setupClient(String ip, int port) {
         client = MongoClients.create(MongoClientSettings.builder()
                 .applyToClusterSettings(builder -> builder.hosts(
@@ -330,6 +322,15 @@ public class MongoDB {
         database = client.getDatabase(Objects.requireNonNull(MingLib.config.getString("MongoDB.Database")));
     }
 
+    private static void registerCollection(String key) {
+        MongoDB mongo = new MongoDB(key);
+        COLLECTION_MAP.put(key, mongo);
+    }
+
+    private static void clearCollections() {
+        COLLECTION_MAP.clear();
+    }
+
     private void setupCollection() {
         collection = database.getCollection(key);
     }
@@ -346,8 +347,12 @@ public class MongoDB {
         return document.containsKey(KEY_PLAYER);
     }
 
+    @Nullable
     private static UUID getPlayerKey(Document document) {
-        return UUID.fromString((String) document.get(KEY_PLAYER));
+        String name = (String) document.get(KEY_PLAYER);
+        if (name != null)
+            return UUID.fromString(name);
+        return null;
     }
 
     private static void callMongoUploadFinishEvent(String key, MongoCollection<Document> collection, List<Document> documents, @Nullable UUID player) {
