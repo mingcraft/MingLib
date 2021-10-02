@@ -56,6 +56,8 @@ public class Logger {
 
     private static final String ROOT_DIR = "log/";
     private static final DateTimeFormatter TIME_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd-hh-mm-ss");
+    private static final DateTimeFormatter DAY_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+    private static final DateTimeFormatter HOUR_FORMAT = DateTimeFormatter.ofPattern("hh-mm-ss");
     private static final String LOG_FORMAT = "[%s] [%s] : %s\n";
     private static final ConsoleCommandSender sender = Bukkit.getConsoleSender();
 
@@ -228,6 +230,14 @@ public class Logger {
 
     public static String now() {
         return TIME_FORMAT.format(LocalDateTime.now());
+    }
+
+    public static String ymd() {
+        return DAY_FORMAT.format(LocalDateTime.now());
+    }
+
+    public static String hms() {
+        return HOUR_FORMAT.format(LocalDateTime.now());
     }
 
     private static void callLoggerRegisteredEvent(String key, Logger logger) {
