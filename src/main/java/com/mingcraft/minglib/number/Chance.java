@@ -57,6 +57,10 @@ public class Chance {
         return randomInteger(Math.min(min, decimal.getPlaces()), decimal.getPlaces()) < Decimal.parseValue(value, decimal);
     }
 
+    public static double percentageToValue(double percentage) {
+        return percentage / 100;
+    }
+
     public static int getAppearIndex(List<Double> values, Decimal decimal) {
         int random = randomInteger(decimal);
         int compare = 0;
