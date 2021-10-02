@@ -55,7 +55,7 @@ public class Logger {
     }
 
     private static final String ROOT_DIR = "log/";
-    private static final DateTimeFormatter TIME_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm:ss");
+    private static final DateTimeFormatter TIME_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd-hh-mm-ss");
     private static final String LOG_FORMAT = "[%s] [%s] : %s\n";
     private static final ConsoleCommandSender sender = Bukkit.getConsoleSender();
 
@@ -84,13 +84,6 @@ public class Logger {
      */
     private final BufferedWriter writer;
 
-    private Logger() {
-        this.key = null;
-        this.file = null;
-        this.sendConsole = false;
-        this.writer = null;
-    }
-
     /**
      * Create new logger with key and file path
      * @param key Logger key
@@ -104,7 +97,6 @@ public class Logger {
 
         if (!file.exists()) {
             file.getParentFile().mkdirs();
-            file.createNewFile();
         }
         this.writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(this.file, true)));
     }
