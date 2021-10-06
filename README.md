@@ -7,8 +7,8 @@ repositories {
     maven {
         url = uri("https://maven.pkg.github.com/mingcraft/minglib")
         credentials {
-            username = env.GPR_USER.value
-            password = env.GPR_KEY.value
+            username = "username"
+            password = "token"
         }
     }
 }
