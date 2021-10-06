@@ -3,14 +3,18 @@
 
 # Gradle
 ```java
-allprojects {
-	repositories {
-		maven { url 'https://jitpack.io' }
-	}
+repositories {
+    maven {
+        url = uri("https://maven.pkg.github.com/mingcraft/minglib")
+        credentials {
+            username = env.GPR_USER.value
+            password = env.GPR_KEY.value
+        }
+    }
 }
 ```
 ```java
 dependencies {
-    implementation 'com.github.mingcraft:minglib:1.0.6'
+    compileOnly 'com.mingcraft:minglib:1.0.6'
 }
 ```
