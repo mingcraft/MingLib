@@ -1,6 +1,5 @@
 package com.mingcraft.minglib.db;
 
-import com.google.api.client.util.Lists;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.mingcraft.minglib.MingLib;

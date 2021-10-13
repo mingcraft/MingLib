@@ -12,6 +12,7 @@ import org.yaml.snakeyaml.external.biz.base64Coder.Base64Coder;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Map;
 
 public class Serializer {
@@ -82,25 +83,31 @@ public class Serializer {
         try {
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
             BukkitObjectOutputStream dataOutput = new BukkitObjectOutputStream(outputStream);
-
-            dataOutput.writeObject(maps);
-
+            for (Map.Entry<Integer, ItemStack> entry : maps.entrySet()) {
+                dataOutput.writeInt(entry.getKey());
+                dataOutput.writeObject(entry.getValue());
+            }
             dataOutput.close();
             return Base64Coder.encodeLines(outputStream.toByteArray());
-        } catch (Exception e) {
-            throw new IllegalStateException("Unable to save item stacks.", e);
+        } catch (Exception ex) {
+            throw new IllegalStateException("Unable to save item stacks.", ex);
         }
     }
 
-    public static Map<Integer,ItemStack> deserializeItemStackMap(String serialized) throws IOException {
+    public static Map<Integer,ItemStack> deserializeItemStackMap(String serialized, int length) throws IOException {
         try {
             ByteArrayInputStream inputStream = new ByteArrayInputStream(Base64Coder.decodeLines(serialized));
             BukkitObjectInputStream dataInput = new BukkitObjectInputStream(inputStream);
-            Map<Integer,ItemStack> maps = (Map<Integer, ItemStack>) dataInput.readObject();
+            Map<Integer, ItemStack> maps = new HashMap<>();
+
+            for (int i = 0; i < length; i++) {
+                maps.put(dataInput.readInt(), (ItemStack) dataInput.readObject());
+            }
+
             dataInput.close();
             return maps;
-        } catch (ClassNotFoundException e) {
-            throw new IOException("Unable to decode class type.", e);
+        } catch (ClassNotFoundException ex) {
+            throw new IOException("Unable to decode class type.", ex);
         }
     }
 
