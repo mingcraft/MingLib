@@ -15,6 +15,6 @@ repositories {
 ```
 ```java
 dependencies {
-        compileOnly 'com.mingcraft:minglib:1.0.7'
+        compileOnly 'com.mingcraft:minglib:1.0.8'
         }
 ```

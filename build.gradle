@@ -6,7 +6,7 @@ plugins {
 }
 
 group = "com.mingcraft.minglib"
-version = "1.0.7"
+version = "1.0.8"
 
 compileJava.options.encoding = 'UTF-8'
 tasks.withType(JavaCompile) {
@@ -27,11 +27,6 @@ dependencies {
     compileOnly 'org.spigotmc:spigot:1.17.1-R0.1-SNAPSHOT'
 
     implementation 'org.mongodb:mongodb-driver-sync:4.3.2'
-    implementation 'org.junit.jupiter:junit-jupiter:5.8.1'
-
-    implementation 'com.google.api-client:google-api-client:1.32.1'
-    implementation 'com.google.oauth-client:google-oauth-client-jetty:1.32.1'
-    implementation 'com.google.apis:google-api-services-drive:v3-rev20210919-1.32.1'
 }
 
 processResources {
