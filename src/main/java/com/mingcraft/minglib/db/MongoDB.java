@@ -104,7 +104,6 @@ public class MongoDB {
     public void updateOne(Document document, String key, Object value) {
         deleteOne(key, value);
         insertOne(document);
-        callMongoUploadFinishEvent(key, collection, new ArrayList<>() {{add(document);}}, getPlayerKey(document));
     }
 
     /**
@@ -116,7 +115,6 @@ public class MongoDB {
     public void updateMany(List<Document> documents, String key, Object value) {
         deleteMany(key, value);
         insertMany(documents);
-        callMongoUploadFinishEvent(key, collection, documents, getPlayerKey(documents.get(0)));
     }
 
     /**
@@ -127,7 +125,6 @@ public class MongoDB {
     public void updateMany(List<Document> documents, String key) {
         deleteMany(key);
         insertMany(documents);
-        callMongoUploadFinishEvent(key, collection, documents, getPlayerKey(documents.get(0)));
     }
 
     /**
@@ -137,7 +134,6 @@ public class MongoDB {
     public void updateAll(List<Document> documents) {
         deleteAll();
         insertMany(documents);
-        callMongoUploadFinishEvent(key, collection, documents, getPlayerKey(documents.get(0)));
     }
 
     /**
@@ -146,7 +142,6 @@ public class MongoDB {
      */
     public void insertOne(Document document) {
         collection.insertOne(document);
-        callMongoUploadFinishEvent(key, collection, new ArrayList<>() {{add(document);}}, getPlayerKey(document));
     }
 
     /**
@@ -155,7 +150,6 @@ public class MongoDB {
      */
     public void insertMany(List<Document> documents) {
         collection.insertMany(documents);
-        callMongoUploadFinishEvent(key, collection, documents, getPlayerKey(documents.get(0)));
     }
 
     /**
@@ -165,11 +159,7 @@ public class MongoDB {
      * @return Downloaded document.
      */
     public Document downloadOne(String key, Object value) {
-        Document document = collection.find(Filters.eq(key, value)).first();
-        if (document != null) {
-            callMongoDownloadFinishEvent(this.key, collection, new ArrayList<>() {{add(document);}}, getPlayerKey(document));
-        }
-        return document;
+        return collection.find(Filters.eq(key, value)).first();
     }
 
     /**
@@ -183,9 +173,6 @@ public class MongoDB {
         List<Document> documents = new ArrayList<>();
         while (cursor.hasNext()) {
             documents.add(cursor.next());
-        }
-        if (documents.size() > 0) {
-            callMongoDownloadFinishEvent(this.key, collection, documents, getPlayerKey(documents.get(0)));
         }
         return documents;
     }
@@ -201,9 +188,6 @@ public class MongoDB {
         while (cursor.hasNext()) {
             documents.add(cursor.next());
         }
-        if (documents.size() > 0) {
-            callMongoDownloadFinishEvent(this.key, collection, documents, getPlayerKey(documents.get(0)));
-        }
         return documents;
     }
 
@@ -216,9 +200,6 @@ public class MongoDB {
         List<Document> documents = new ArrayList<>();
         while (cursor.hasNext()) {
             documents.add(cursor.next());
-        }
-        if (documents.size() > 0) {
-            callMongoDownloadFinishEvent(this.key, collection, documents, getPlayerKey(documents.get(0)));
         }
         return documents;
     }
@@ -237,11 +218,6 @@ public class MongoDB {
 
     public void deleteAll() {
         collection.drop();
-    }
-
-    public void uploadFile(File file) throws FileNotFoundException {
-        InputStream inputStream = new FileInputStream(file);
-
     }
 
     public static String toJson(Document document) {
@@ -354,13 +330,4 @@ public class MongoDB {
         return null;
     }
 
-    private static void callMongoUploadFinishEvent(String key, MongoCollection<Document> collection, List<Document> documents, @Nullable UUID player) {
-        MongoUploadFinishEvent event = new MongoUploadFinishEvent(key, collection, documents, player);
-        Bukkit.getPluginManager().callEvent(event);
-    }
-
-    private static void callMongoDownloadFinishEvent(String key, MongoCollection<Document> collection, List<Document> documents, @Nullable UUID player) {
-        MongoDownloadFinishEvent event = new MongoDownloadFinishEvent(key, collection, documents, player);
-        Bukkit.getPluginManager().callEvent(event);
-    }
 }
