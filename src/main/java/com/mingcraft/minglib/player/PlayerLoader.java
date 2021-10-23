@@ -1,5 +1,8 @@
 package com.mingcraft.minglib.player;
 
+import com.mingcraft.minglib.events.player.PlayerRegisterEvent;
+import com.mingcraft.minglib.events.player.PlayerUnregisterEvent;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 import java.util.HashMap;
@@ -12,10 +15,17 @@ public class PlayerLoader {
     public static void registerPlayer(Player player) {
         RealPlayer realPlayer = new RealPlayer(player);
         playerMap.put(player.getName(), realPlayer);
+
+        PlayerRegisterEvent event = new PlayerRegisterEvent(realPlayer);
+        Bukkit.getPluginManager().callEvent(event);
     }
 
     public static void unregisterPlayer(Player player) {
+        RealPlayer realPlayer = playerMap.get(player.getName());
         playerMap.remove(player.getName());
+
+        PlayerUnregisterEvent event = new PlayerUnregisterEvent(realPlayer);
+        Bukkit.getPluginManager().callEvent(event);
     }
 
     public static RealPlayer getRealPlayer(Player player) {

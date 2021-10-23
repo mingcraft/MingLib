@@ -22,4 +22,5 @@ public final class MingLib extends JavaPlugin {
         saveDefaultConfig();
         config = getConfig();
     }
+
 }
