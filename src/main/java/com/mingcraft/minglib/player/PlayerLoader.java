@@ -5,8 +5,10 @@ import com.mingcraft.minglib.events.player.PlayerUnregisterEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 public class PlayerLoader {
 
@@ -26,6 +28,14 @@ public class PlayerLoader {
 
         PlayerUnregisterEvent event = new PlayerUnregisterEvent(realPlayer);
         Bukkit.getPluginManager().callEvent(event);
+    }
+
+    public static Collection<RealPlayer> getRealPlayers() {
+        return playerMap.values();
+    }
+
+    public static Set<String> getUuids() {
+        return playerMap.keySet();
     }
 
     public static RealPlayer getRealPlayer(Player player) {
