@@ -32,6 +32,15 @@ public class PlayerLoader {
         return playerMap.get(player.getName());
     }
 
+    public static RealPlayer getRealPlayer(String uuid) {
+        for (RealPlayer player : playerMap.values()) {
+            if (player.getUuid().equals(uuid)) {
+                return player;
+            }
+        }
+        return null;
+    }
+
     public static String getUuid(Player player) {
         return playerMap.get(player.getName()).getUuid();
     }
