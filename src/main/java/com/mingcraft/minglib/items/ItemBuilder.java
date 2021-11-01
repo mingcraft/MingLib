@@ -187,14 +187,14 @@ public class ItemBuilder {
         return this;
     }
 
-    public ItemBuilder setLeatherColor(int red, int green, int blue) {
+    public ItemBuilder setLeatherArmorColor(int red, int green, int blue) {
         if (itemMeta instanceof LeatherArmorMeta leatherArmorMeta) {
             leatherArmorMeta.setColor(org.bukkit.Color.fromRGB(red, green, blue));
         }
         return this;
     }
 
-    public ItemBuilder setLeatherColor(org.bukkit.Color color) {
+    public ItemBuilder setLeatherArmorColor(org.bukkit.Color color) {
         if (itemMeta instanceof LeatherArmorMeta leatherArmorMeta) {
             leatherArmorMeta.setColor(color);
         }
