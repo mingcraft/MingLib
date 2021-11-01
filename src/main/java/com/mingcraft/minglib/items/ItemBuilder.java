@@ -12,6 +12,7 @@ import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.inventory.meta.LeatherArmorMeta;
 
 public class ItemBuilder {
 
@@ -76,7 +77,7 @@ public class ItemBuilder {
         int lineNumber = getLineNumber(size, line);
         for (int i = 0; i < size; i++) {
             if (i == lineNumber) {
-                newLores.add(lore);
+                newLores.add(Color.colored(lore));
             }
             newLores.add(lores.get(i));
         }
@@ -99,14 +100,14 @@ public class ItemBuilder {
 
     public ItemBuilder appendLore(List<String> lore) {
         List<String> lores = getLore();
-        lores.addAll(lore);
+        lores.addAll(Color.colored(lore));
         itemMeta.setLore(lores);
         return this;
     }
 
     public ItemBuilder appendLore(String lore) {
         List<String> lores = getLore();
-        lores.add(lore);
+        lores.add(Color.colored(lore));
         itemMeta.setLore(lores);
         return this;
     }
@@ -183,6 +184,20 @@ public class ItemBuilder {
 
     public ItemBuilder removeAttributeModifier(Attribute attribute) {
         itemMeta.removeAttributeModifier(attribute);
+        return this;
+    }
+
+    public ItemBuilder setLeatherColor(int red, int green, int blue) {
+        if (itemMeta instanceof LeatherArmorMeta leatherArmorMeta) {
+            leatherArmorMeta.setColor(org.bukkit.Color.fromRGB(red, green, blue));
+        }
+        return this;
+    }
+
+    public ItemBuilder setLeatherColor(org.bukkit.Color color) {
+        if (itemMeta instanceof LeatherArmorMeta leatherArmorMeta) {
+            leatherArmorMeta.setColor(color);
+        }
         return this;
     }
 
