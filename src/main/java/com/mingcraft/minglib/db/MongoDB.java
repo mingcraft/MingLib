@@ -13,7 +13,11 @@ import com.mongodb.client.*;
 import com.mongodb.client.model.Filters;
 import org.bson.Document;
 import org.bukkit.Bukkit;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.util.io.BukkitObjectInputStream;
+import org.bukkit.util.io.BukkitObjectOutputStream;
 import org.jetbrains.annotations.Nullable;
+import org.yaml.snakeyaml.external.biz.base64Coder.Base64Coder;
 
 import java.io.*;
 import java.util.*;
@@ -246,6 +250,30 @@ public class MongoDB {
 
     public static Set<String> getKeySet() {
         return COLLECTION_MAP.keySet();
+    }
+
+    public static String toBase64(Object obj) {
+        try {
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+            BukkitObjectOutputStream dataOutput = new BukkitObjectOutputStream(outputStream);
+            dataOutput.writeObject(obj);
+            dataOutput.close();
+            return Base64Coder.encodeLines(outputStream.toByteArray());
+        } catch (Exception e) {
+            throw new IllegalStateException("Object incode error.", e);
+        }
+    }
+
+    public static Object fromBase64(String base64) throws IOException {
+        try {
+            ByteArrayInputStream inputStream = new ByteArrayInputStream(Base64Coder.decodeLines(base64));
+            BukkitObjectInputStream dataInput = new BukkitObjectInputStream(inputStream);
+            ItemStack item = (ItemStack) dataInput.readObject();
+            dataInput.close();
+            return item;
+        } catch (ClassNotFoundException | IOException e) {
+            throw new IOException("Object decode error.", e);
+        }
     }
 
     public static void registerMongoDB() {

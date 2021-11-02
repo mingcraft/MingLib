@@ -16,6 +16,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Serializer {
+
     public static String serializeItemStack(ItemStack serialized) throws IllegalStateException {
         try {
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
