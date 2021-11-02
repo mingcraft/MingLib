@@ -133,7 +133,11 @@ public class Serializer {
         try {
             ByteArrayInputStream inputStream = new ByteArrayInputStream(Base64Coder.decodeLines(serialized));
             BukkitObjectInputStream dataInput = new BukkitObjectInputStream(inputStream);
-            Inventory inventory = Bukkit.getServer().createInventory(null, dataInput.readInt());
+
+            int in = dataInput.readInt();
+            int size = getInventorySize(in);
+
+            Inventory inventory = Bukkit.getServer().createInventory(null, size);
 
             for (int i = 0; i < inventory.getSize(); i++) {
                 inventory.setItem(i, (ItemStack) dataInput.readObject());
@@ -190,5 +194,27 @@ public class Serializer {
         } catch (ClassNotFoundException e) {
             throw new IOException("Unable to decode class type.", e);
         }
+    }
+
+    private static int getInventorySize(int readSlot) {
+        if (readSlot < 9) {
+            return 9;
+        }
+        else if (readSlot < 18) {
+            return 18;
+        }
+        else if (readSlot < 27) {
+            return 27;
+        }
+        else if (readSlot < 36) {
+            return 36;
+        }
+        else if (readSlot < 45) {
+            return 45;
+        }
+        else if (readSlot < 54) {
+            return 54;
+        }
+        return 54;
     }
 }
