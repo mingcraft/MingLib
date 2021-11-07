@@ -6,7 +6,7 @@ plugins {
 }
 
 group = "com.mingcraft.minglib"
-version = "1.0.21"
+version = "1.0.22"
 
 compileJava.options.encoding = 'UTF-8'
 tasks.withType(JavaCompile) {
