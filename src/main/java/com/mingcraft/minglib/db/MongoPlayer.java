@@ -2,9 +2,10 @@ package com.mingcraft.minglib.db;
 
 import com.mingcraft.minglib.player.RealPlayer;
 import com.mongodb.client.MongoCollection;
-import com.mongodb.client.model.Filters;
 import org.bson.Document;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
@@ -23,9 +24,10 @@ public class MongoPlayer {
 
     public static void downloadPlayerData(RealPlayer player) {
         executor.execute(() ->
-                collectionMap.forEach((key, value) ->
-                        download(player, key, value)
-                )
+                collectionMap.forEach((key, value) -> {
+                    Class<?> clazz = classMap.get(key);
+                    download(player, key, value, clazz);
+                })
         );
     }
 
@@ -48,7 +50,8 @@ public class MongoPlayer {
     public static void downloadPlayerData(RealPlayer player, MongoCollection<Document> collection) {
         executor.execute(() -> {
             Map<String, PlayerData> dataMap = collectionMap.get(collection);
-            download(player, collection, dataMap);
+            Class<?> clazz = classMap.get(collection);
+            download(player, collection, dataMap, clazz);
         });
     }
 
@@ -71,35 +74,27 @@ public class MongoPlayer {
         });
     }
 
-    private static void download(RealPlayer player, MongoCollection<Document> collection, Map<String, PlayerData> dataMap) {
+    private static void download(RealPlayer player, MongoCollection<Document> collection, Map<String, PlayerData> dataMap, Class<?> clazz) {
+        try {
+            Method method = clazz.getDeclaredMethod("download", RealPlayer.class, MongoCollection.class, Map.class, Class.class);
+            method.invoke(clazz.getConstructor().newInstance(), player, collection, dataMap, clazz);
+        } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException | InstantiationException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static void save(RealPlayer player, MongoCollection<Document> collection, Map<String, PlayerData> dataMap) {
         Class<?> clazz = classMap.get(collection);
         if (clazz == null) {
             return;
         }
 
-        String uuid = player.getUuid();
-        Document document = collection.find(Filters.eq("uuid", uuid)).first();
-        if (document == null) {
-            return;
+        try {
+            Method method = clazz.getDeclaredMethod("save", RealPlayer.class, MongoCollection.class, Map.class);
+            method.invoke(clazz.getConstructor().newInstance(), player, collection, dataMap);
+        } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException | InstantiationException e) {
+            e.printStackTrace();
         }
-
-        dataMap.put(player.getUuid(), (PlayerData) MongoDB.toObject(document, clazz));
-    }
-
-    private static void save(RealPlayer player, MongoCollection<Document> collection, Map<String, PlayerData> dataMap) {
-        String uuid = player.getUuid();
-        PlayerData data = dataMap.get(uuid);
-        if (data == null) {
-            return;
-        }
-
-        Document document = MongoDB.toDocument(data);
-        if (document == null) {
-            return;
-        }
-
-        collection.deleteOne(Filters.eq("uuid", uuid));
-        collection.insertOne(document);
     }
 
 }
