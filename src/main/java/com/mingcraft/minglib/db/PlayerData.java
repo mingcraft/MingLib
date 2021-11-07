@@ -1,11 +1,11 @@
 package com.mingcraft.minglib.db;
 
-public abstract class PlayerData {
+public interface PlayerData {
 
-    public abstract Object getPlayerData(String uuid);
+    Object getPlayerData(String uuid);
 
-    public abstract boolean hasPlayerData(String uuid);
+    boolean hasPlayerData(String uuid);
 
-    public abstract void initPlayerData(String uuid);
+    void initPlayerData(String uuid);
 
 }
