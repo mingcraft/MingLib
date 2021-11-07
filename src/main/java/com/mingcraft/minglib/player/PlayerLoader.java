@@ -1,5 +1,6 @@
 package com.mingcraft.minglib.player;
 
+import com.mingcraft.minglib.db.MongoPlayer;
 import com.mingcraft.minglib.events.player.PlayerRegisterEvent;
 import com.mingcraft.minglib.events.player.PlayerUnregisterEvent;
 import org.bukkit.Bukkit;
@@ -18,6 +19,8 @@ public class PlayerLoader {
         RealPlayer realPlayer = new RealPlayer(player);
         playerMap.put(player.getName(), realPlayer);
 
+        MongoPlayer.downloadPlayerData(realPlayer);
+
         PlayerRegisterEvent event = new PlayerRegisterEvent(realPlayer);
         Bukkit.getPluginManager().callEvent(event);
     }
@@ -25,6 +28,8 @@ public class PlayerLoader {
     public static void unregisterPlayer(Player player) {
         RealPlayer realPlayer = playerMap.get(player.getName());
         playerMap.remove(player.getName());
+
+        MongoPlayer.saveAndUnloadPlayerData(realPlayer);
 
         PlayerUnregisterEvent event = new PlayerUnregisterEvent(realPlayer);
         Bukkit.getPluginManager().callEvent(event);
