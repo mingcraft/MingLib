@@ -3,8 +3,6 @@ package com.mingcraft.minglib.db;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.mingcraft.minglib.MingLib;
-import com.mingcraft.minglib.events.db.MongoDownloadFinishEvent;
-import com.mingcraft.minglib.events.db.MongoUploadFinishEvent;
 import com.mingcraft.minglib.exceptions.db.MongoConnectionFailedException;
 import com.mongodb.ConnectionString;
 import com.mongodb.MongoClientSettings;
@@ -21,11 +19,17 @@ import org.yaml.snakeyaml.external.biz.base64Coder.Base64Coder;
 
 import java.io.*;
 import java.util.*;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  * MingCraft MongoDB API
  */
 public class MongoDB {
+
+    private static final ExecutorService executor = Executors.newFixedThreadPool(4);
 
     private static final String KEY_PLAYER = "uuid";
     private static final Gson gson = new GsonBuilder().create();
@@ -106,8 +110,11 @@ public class MongoDB {
      * @param value The value that matches the key.
      */
     public void updateOne(Document document, String key, Object value) {
-        deleteOne(key, value);
-        insertOne(document);
+        ExecutorService executor = Executors.newFixedThreadPool(4);
+        executor.execute(() -> {
+            collection.deleteOne(Filters.eq(key, value));
+            collection.insertOne(document);
+        });
     }
 
     /**
@@ -117,8 +124,11 @@ public class MongoDB {
      * @param value The value that matches the key.
      */
     public void updateMany(List<Document> documents, String key, Object value) {
-        deleteMany(key, value);
-        insertMany(documents);
+        ExecutorService executor = Executors.newFixedThreadPool(4);
+        executor.execute(() -> {
+            collection.deleteMany(Filters.eq(key, value));
+            collection.insertMany(documents);
+        });
     }
 
     /**
@@ -127,8 +137,11 @@ public class MongoDB {
      * @param key The key inside the document to be updated.
      */
     public void updateMany(List<Document> documents, String key) {
-        deleteMany(key);
-        insertMany(documents);
+        ExecutorService executor = Executors.newFixedThreadPool(4);
+        executor.execute(() -> {
+            collection.deleteMany(Filters.exists(key));
+            collection.insertMany(documents);
+        });
     }
 
     /**
@@ -136,8 +149,11 @@ public class MongoDB {
      * @param documents Documents that you want to update.
      */
     public void updateAll(List<Document> documents) {
-        deleteAll();
-        insertMany(documents);
+        ExecutorService executor = Executors.newFixedThreadPool(4);
+        executor.execute(() -> {
+            collection.drop();
+            collection.insertMany(documents);
+        });
     }
 
     /**
@@ -145,7 +161,10 @@ public class MongoDB {
      * @param document Document that you want to insert
      */
     public void insertOne(Document document) {
-        collection.insertOne(document);
+        ExecutorService executor = Executors.newFixedThreadPool(4);
+        executor.execute(() -> {
+            collection.insertOne(document);
+        });
     }
 
     /**
@@ -153,7 +172,10 @@ public class MongoDB {
      * @param documents Documents that you want to insert
      */
     public void insertMany(List<Document> documents) {
-        collection.insertMany(documents);
+        ExecutorService executor = Executors.newFixedThreadPool(4);
+        executor.execute(() -> {
+            collection.insertMany(documents);
+        });
     }
 
     /**
@@ -162,8 +184,28 @@ public class MongoDB {
      * @param value The value that matches the key.
      * @return Downloaded document.
      */
+    @Nullable
     public Document downloadOne(String key, Object value) {
-        return collection.find(Filters.eq(key, value)).first();
+        ExecutorService executor = Executors.newFixedThreadPool(4);
+        try {
+            return executor.submit(new DownloadOne(collection, key, value)).get();
+        } catch (InterruptedException | ExecutionException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    private record DownloadOne(
+            MongoCollection<Document> collection,
+            String key,
+            Object value
+    ) implements Callable<Document> {
+
+        @Override
+        public Document call() {
+            return collection.find(Filters.eq(key, value)).first();
+        }
+
     }
 
     /**
@@ -172,13 +214,33 @@ public class MongoDB {
      * @param value The value that matches the key.
      * @return Downloaded documents.
      */
+    @Nullable
     public List<Document> downloadMany(String key, Object value) {
-        MongoCursor<Document> cursor = collection.find(Filters.eq(key, value)).iterator();
-        List<Document> documents = new ArrayList<>();
-        while (cursor.hasNext()) {
-            documents.add(cursor.next());
+        ExecutorService executor = Executors.newFixedThreadPool(4);
+        try {
+            return executor.submit(new DownloadMany(collection, key, value)).get();
+        } catch (InterruptedException | ExecutionException e) {
+            e.printStackTrace();
         }
-        return documents;
+        return null;
+    }
+
+    private record DownloadMany(
+        MongoCollection<Document> collection,
+        String key,
+        Object value
+    ) implements Callable<List<Document>> {
+
+        @Override
+        public List<Document> call() {
+            MongoCursor<Document> cursor = collection.find(Filters.eq(key, value)).iterator();
+            List<Document> documents = new ArrayList<>();
+            while (cursor.hasNext()) {
+                documents.add(cursor.next());
+            }
+            return documents;
+        }
+
     }
 
     /**
@@ -186,42 +248,83 @@ public class MongoDB {
      * @param key The key inside the document to download.
      * @return Downloaded documents.
      */
+    @Nullable
     public List<Document> downloadMany(String key) {
-        MongoCursor<Document> cursor = collection.find(Filters.exists(key)).iterator();
-        List<Document> documents = new ArrayList<>();
-        while (cursor.hasNext()) {
-            documents.add(cursor.next());
+        ExecutorService executor = Executors.newFixedThreadPool(4);
+        try {
+            return executor.submit(new DownloadMany2(collection, key)).get();
+        } catch (InterruptedException | ExecutionException e) {
+            e.printStackTrace();
         }
-        return documents;
+        return null;
+    }
+
+    private record DownloadMany2(
+        MongoCollection<Document> collection,
+        String key
+    ) implements Callable<List<Document>> {
+
+        @Override
+        public List<Document> call() {
+            MongoCursor<Document> cursor = collection.find(Filters.exists(key)).iterator();
+            List<Document> documents = new ArrayList<>();
+            while (cursor.hasNext()) {
+                documents.add(cursor.next());
+            }
+            return documents;
+        }
+
     }
 
     /**
      * Download all documents from MongoCollection.
      * @return Downloaded documents.
      */
+    @Nullable
     public List<Document> downloadAll() {
-        MongoCursor<Document> cursor = collection.find().iterator();
-        List<Document> documents = new ArrayList<>();
-        while (cursor.hasNext()) {
-            documents.add(cursor.next());
+        ExecutorService executor = Executors.newFixedThreadPool(4);
+        try {
+            return executor.submit(new DownloadAll(collection)).get();
+        } catch (InterruptedException | ExecutionException e) {
+            e.printStackTrace();
         }
-        return documents;
+        return null;
+    }
+
+    private record DownloadAll(
+        MongoCollection<Document> collection
+    ) implements Callable<List<Document>> {
+
+        @Override
+        public List<Document> call() {
+            MongoCursor<Document> cursor = collection.find().iterator();
+            List<Document> documents = new ArrayList<>();
+            while (cursor.hasNext()) {
+                documents.add(cursor.next());
+            }
+            return documents;
+        }
+
     }
 
     public void deleteOne(String key, Object value) {
-        collection.deleteOne(Filters.eq(key, value));
+        ExecutorService executor = Executors.newFixedThreadPool(4);
+        executor.execute(() -> collection.deleteOne(Filters.eq(key, value)));
     }
 
     public void deleteMany(String key, Object value) {
-        collection.deleteMany(Filters.eq(key, value));
+        ExecutorService executor = Executors.newFixedThreadPool(4);
+        executor.execute(() -> collection.deleteMany(Filters.eq(key, value)));
     }
 
     public void deleteMany(String key) {
-        collection.deleteMany(Filters.exists(key));
+        ExecutorService executor = Executors.newFixedThreadPool(4);
+        executor.execute(() -> collection.deleteMany(Filters.exists(key)));
     }
 
     public void deleteAll() {
-        collection.drop();
+        ExecutorService executor = Executors.newFixedThreadPool(4);
+        executor.execute(() -> collection.drop());
     }
 
     public static String toJson(Document document) {
