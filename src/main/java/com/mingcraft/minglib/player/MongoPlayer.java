@@ -194,7 +194,7 @@ public class MongoPlayer {
 
     private static void download(RealPlayer player, MongoPlayer mongoPlayer) {
         try {
-            Class<?> clazz = mongoPlayer.getClass();
+            Class<?> clazz = mongoPlayer.getDataClass();
             Method method = clazz.getMethod("download", RealPlayer.class, MongoPlayer.class);
             method.invoke(clazz.getConstructor().newInstance(), player, mongoPlayer);
         } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException | InstantiationException e) {
