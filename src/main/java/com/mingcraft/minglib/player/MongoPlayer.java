@@ -1,7 +1,6 @@
-package com.mingcraft.minglib.db;
+package com.mingcraft.minglib.player;
 
 import com.mingcraft.minglib.colors.Color;
-import com.mingcraft.minglib.player.RealPlayer;
 import com.mongodb.client.MongoCollection;
 import org.bson.Document;
 import org.bukkit.Bukkit;

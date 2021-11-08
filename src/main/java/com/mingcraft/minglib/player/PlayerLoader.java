@@ -1,6 +1,5 @@
 package com.mingcraft.minglib.player;
 
-import com.mingcraft.minglib.db.MongoPlayer;
 import com.mingcraft.minglib.events.player.PlayerRegisterEvent;
 import com.mingcraft.minglib.events.player.PlayerUnregisterEvent;
 import org.bukkit.Bukkit;

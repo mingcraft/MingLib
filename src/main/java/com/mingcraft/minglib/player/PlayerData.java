@@ -1,6 +1,6 @@
-package com.mingcraft.minglib.db;
+package com.mingcraft.minglib.player;
 
-import com.mingcraft.minglib.player.RealPlayer;
+import com.mingcraft.minglib.db.MongoDB;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Filters;
 import org.bson.Document;
