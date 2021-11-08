@@ -136,7 +136,10 @@ public class MongoPlayer {
             Method method = clazz.getMethod("download", RealPlayer.class, MongoCollection.class, Map.class, Class.class);
             method.invoke(clazz.getConstructor().newInstance(), player, collection, dataMap, clazz);
         } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException | InstantiationException e) {
-            e.getCause().printStackTrace();
+            if (e.getCause() != null)
+                e.getCause().printStackTrace();
+            else
+                e.printStackTrace();
         }
     }
 
@@ -150,7 +153,10 @@ public class MongoPlayer {
             Method method = clazz.getMethod("save", RealPlayer.class, MongoCollection.class, Map.class);
             method.invoke(clazz.getConstructor().newInstance(), player, collection, dataMap);
         } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException | InstantiationException e) {
-            e.getCause().printStackTrace();
+            if (e.getCause() != null)
+                e.getCause().printStackTrace();
+            else
+                e.printStackTrace();
         }
     }
 
@@ -164,7 +170,10 @@ public class MongoPlayer {
             Method method = clazz.getMethod("unload", RealPlayer.class, MongoCollection.class, Map.class);
             method.invoke(clazz.getConstructor().newInstance(), player, collection, dataMap);
         } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException | InstantiationException e) {
-            e.getCause().printStackTrace();
+            if (e.getCause() != null)
+                e.getCause().printStackTrace();
+            else
+                e.printStackTrace();
         }
     }
 

@@ -1,27 +1,37 @@
 package com.mingcraft.minglib.player;
 
+import com.mingcraft.minglib.MingLib;
 import com.mingcraft.minglib.events.player.PlayerRegisterEvent;
 import com.mingcraft.minglib.events.player.PlayerUnregisterEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class PlayerLoader {
 
-    private static final Map<String, RealPlayer> playerMap = new HashMap<>();
+    private static final ExecutorService executor = Executors.newFixedThreadPool(12);
+
+    private static final Map<String, RealPlayer> playerMap = new Hashtable<>();
+
+    public static void shutdown() {
+        executor.shutdown();
+    }
 
     public static void registerPlayer(Player player) {
-        RealPlayer realPlayer = new RealPlayer(player);
-        playerMap.put(player.getName(), realPlayer);
+        executor.execute(() -> {
+            RealPlayer realPlayer = new RealPlayer(player);
+            playerMap.put(player.getName(), realPlayer);
 
-        MongoPlayer.downloadPlayerData(realPlayer);
+            MongoPlayer.downloadPlayerData(realPlayer);
 
-        PlayerRegisterEvent event = new PlayerRegisterEvent(realPlayer);
-        Bukkit.getPluginManager().callEvent(event);
+            Bukkit.getScheduler().runTask(MingLib.instance, () -> {
+                PlayerRegisterEvent event = new PlayerRegisterEvent(realPlayer);
+                Bukkit.getPluginManager().callEvent(event);
+            });
+        });
     }
 
     public static void unregisterPlayer(Player player) {
