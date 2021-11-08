@@ -179,7 +179,6 @@ public class Logger {
         try {
             Logger logger = new Logger(key, ROOT_DIR + path);
             LOGGERS.put(key, logger);
-            callLoggerRegisteredEvent(logger.getKey(), logger);
         } catch (IOException e) {
             throw new LoggerRegisterFailedException("File does not exist.");
         }
@@ -202,7 +201,6 @@ public class Logger {
     private void disableLogger() {
         disableWriter();
         LOGGERS.remove(this.key);
-        callLoggerUnregisteredEvent(this.key, this);
     }
 
     private void disableWriter() {
@@ -238,16 +236,6 @@ public class Logger {
 
     public static String hms() {
         return HOUR_FORMAT.format(LocalDateTime.now());
-    }
-
-    private static void callLoggerRegisteredEvent(String key, Logger logger) {
-        LoggerRegisteredEvent event = new LoggerRegisteredEvent(key, logger);
-        Bukkit.getPluginManager().callEvent(event);
-    }
-
-    private static void callLoggerUnregisteredEvent(String key, Logger logger) {
-        LoggerUnregisteredEvent event = new LoggerUnregisteredEvent(key, logger);
-        Bukkit.getPluginManager().callEvent(event);
     }
 
 }
