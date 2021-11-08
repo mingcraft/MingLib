@@ -1,6 +1,7 @@
 package com.mingcraft.minglib;
 
 import com.mingcraft.minglib.db.MongoDB;
+import com.mingcraft.minglib.player.MongoPlayer;
 import com.mingcraft.minglib.player.PlayerListener;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -16,6 +17,11 @@ public final class MingLib extends JavaPlugin {
         registerConfig();
         MongoDB.registerMongoDB();
         new PlayerListener(this);
+    }
+
+    @Override
+    public void onDisable() {
+        MongoPlayer.shutdown();
     }
 
     private void registerConfig() {
