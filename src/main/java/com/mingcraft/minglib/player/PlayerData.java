@@ -5,27 +5,26 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Filters;
 import org.bson.Document;
 
-import java.util.Map;
-
 public abstract class PlayerData {
 
-    public void download(RealPlayer player, MongoCollection<Document> collection, Map<String, PlayerData> dataMap, Class<?> clazz) {
+    public void download(RealPlayer player, MongoPlayer mongoPlayer) {
+        Class<?> clazz = mongoPlayer.getDataClass();
         if (clazz == null) {
             return;
         }
 
         String uuid = player.getUuid();
-        Document document = collection.find(Filters.eq("uuid", uuid)).first();
+        Document document = mongoPlayer.getCollection().find(Filters.eq("uuid", uuid)).first();
         if (document == null) {
             return;
         }
 
-        dataMap.put(player.getUuid(), (PlayerData) MongoDB.toObject(document, clazz));
+        mongoPlayer.getData().put(player.getUuid(), (PlayerData) MongoDB.toObject(document, clazz));
     }
 
-    public void save(RealPlayer player, MongoCollection<Document> collection, Map<String, PlayerData> dataMap) {
+    public void save(RealPlayer player, MongoPlayer mongoPlayer) {
         String uuid = player.getUuid();
-        PlayerData data = dataMap.get(uuid);
+        PlayerData data = mongoPlayer.getData().get(uuid);
         if (data == null) {
             return;
         }
@@ -35,12 +34,13 @@ public abstract class PlayerData {
             return;
         }
 
+        MongoCollection<Document> collection = mongoPlayer.getCollection();
         collection.deleteOne(Filters.eq("uuid", uuid));
         collection.insertOne(document);
     }
 
-    public void unload(RealPlayer player, MongoCollection<Document> collection, Map<String, PlayerData> dataMap) {
-        dataMap.remove(player.getUuid());
+    public void unload(RealPlayer player, MongoPlayer mongoPlayer) {
+        mongoPlayer.getData().remove(player.getUuid());
     }
 
 }
