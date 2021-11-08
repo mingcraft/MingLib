@@ -39,4 +39,8 @@ public abstract class PlayerData {
         collection.insertOne(document);
     }
 
+    public void unload(RealPlayer player, MongoCollection<Document> collection, Map<String, PlayerData> dataMap) {
+        dataMap.remove(player.getUuid());
+    }
+
 }
