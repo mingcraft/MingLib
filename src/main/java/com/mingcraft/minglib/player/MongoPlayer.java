@@ -43,7 +43,7 @@ public class MongoPlayer {
     private static final ExecutorService executor = Executors.newFixedThreadPool(12);
     private static final Map<String, MongoPlayer> mongoPlayerMap = new Hashtable<>();
 
-    public static void registerCollection(String key, Class<?> valueClass) {
+    public static void registerMongoPlayer(String key, Class<?> valueClass) {
         MongoCollection<Document> collection = MongoDB.getMongoDB(key).getCollection();
         Map<String, PlayerData> data = new Hashtable<>();
         MongoPlayer mongoPlayer = new MongoPlayer(collection, data, valueClass);
