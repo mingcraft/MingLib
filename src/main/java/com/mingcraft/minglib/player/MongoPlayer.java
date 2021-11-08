@@ -20,9 +20,9 @@ public class MongoPlayer {
 
     private final MongoCollection<Document> collection;
     private final Map<String, PlayerData> data;
-    private final Class<?> clazz;
+    private final Class<? extends PlayerData> clazz;
 
-    public MongoPlayer(MongoCollection<Document> collection, Map<String, PlayerData> data, Class<?> clazz) {
+    public MongoPlayer(MongoCollection<Document> collection, Map<String, PlayerData> data, Class<? extends PlayerData> clazz) {
         this.collection = collection;
         this.data = data;
         this.clazz = clazz;
@@ -43,7 +43,7 @@ public class MongoPlayer {
     private static final ExecutorService executor = Executors.newFixedThreadPool(12);
     private static final Map<String, MongoPlayer> mongoPlayerMap = new Hashtable<>();
 
-    public static void registerMongoPlayer(String key, Class<?> valueClass) {
+    public static void registerMongoPlayer(String key, Class<? extends PlayerData> valueClass) {
         MongoCollection<Document> collection = MongoDB.getMongoDB(key).getCollection();
         Map<String, PlayerData> data = new Hashtable<>();
         MongoPlayer mongoPlayer = new MongoPlayer(collection, data, valueClass);
