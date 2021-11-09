@@ -19,10 +19,7 @@ import org.yaml.snakeyaml.external.biz.base64Coder.Base64Coder;
 
 import java.io.*;
 import java.util.*;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.*;
 
 /**
  * MingCraft MongoDB API
@@ -34,7 +31,7 @@ public class MongoDB {
     private static final String KEY_PLAYER = "uuid";
     private static final Gson gson = new GsonBuilder().create();
 
-    private static final Map<String, MongoDB> COLLECTION_MAP = new HashMap<>();
+    private static final Map<String, MongoDB> COLLECTION_MAP = new ConcurrentHashMap<>();
     private static MongoClient client;
     private static MongoDatabase database;
 

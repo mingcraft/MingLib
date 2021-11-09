@@ -8,7 +8,7 @@ import java.io.*;
 
 public class Mson<T> {
 
-    private static Gson gson = new GsonBuilder().setPrettyPrinting().create();
+    private static final Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
     private String path;
     private T data;
