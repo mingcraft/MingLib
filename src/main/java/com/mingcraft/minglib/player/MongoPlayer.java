@@ -1,15 +1,18 @@
 package com.mingcraft.minglib.player;
 
+import com.mingcraft.minglib.MingLib;
 import com.mingcraft.minglib.colors.Color;
 import com.mingcraft.minglib.db.MongoDB;
+import com.mingcraft.minglib.events.player.PlayerRegisterEvent;
+import com.mingcraft.minglib.events.player.PlayerUnregisterEvent;
 import com.mingcraft.minglib.exceptions.player.UnregisteredMongoPlayerException;
 import com.mongodb.client.MongoCollection;
 import org.bson.Document;
 import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.Hashtable;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
@@ -42,7 +45,7 @@ public class MongoPlayer {
     }
 
     private static final ExecutorService executor = Executors.newFixedThreadPool(12);
-    private static final Map<String, MongoPlayer> mongoPlayerMap = new Hashtable<>();
+    private static final Map<String, MongoPlayer> mongoPlayerMap = new ConcurrentHashMap<>();
 
     public static void registerMongoPlayer(String key, Class<? extends PlayerData> valueClass) {
         MongoCollection<Document> collection = MongoDB.getMongoDB(key).getCollection();
@@ -101,6 +104,33 @@ public class MongoPlayer {
             return mongoPlayer.data.get(uuid);
         }
         throw new UnregisteredMongoPlayerException("등록되지 않은 MongoPlayer 입니다. Data 를 불러올 수 없습니다. [ key = " + key + " ]");
+    }
+
+    public static void registerPlayer(Player player) {
+        executor.execute(() -> {
+            RealPlayer realPlayer = new RealPlayer(player);
+            PlayerLoader.getPlayerMap().put(player.getName(), realPlayer);
+
+            MongoPlayer.downloadPlayerData(realPlayer);
+
+            Bukkit.getScheduler().runTask(MingLib.instance, () -> {
+                PlayerRegisterEvent event = new PlayerRegisterEvent(realPlayer);
+                Bukkit.getPluginManager().callEvent(event);
+            });
+        });
+    }
+
+    public static void unregisterPlayer(Player player) {
+        executor.execute(() -> {
+            RealPlayer realPlayer = PlayerLoader.getPlayerMap().get(player.getName());
+            MongoPlayer.saveAndUnloadPlayerData(realPlayer);
+            PlayerLoader.getPlayerMap().remove(player.getName());
+
+            Bukkit.getScheduler().runTask(MingLib.instance, () -> {
+                PlayerUnregisterEvent event = new PlayerUnregisterEvent(realPlayer);
+                Bukkit.getPluginManager().callEvent(event);
+            });
+        });
     }
 
     public static void downloadPlayerData(RealPlayer player) {

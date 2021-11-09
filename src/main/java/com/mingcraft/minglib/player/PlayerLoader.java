@@ -1,12 +1,11 @@
 package com.mingcraft.minglib.player;
 
-import com.mingcraft.minglib.MingLib;
-import com.mingcraft.minglib.events.player.PlayerRegisterEvent;
-import com.mingcraft.minglib.events.player.PlayerUnregisterEvent;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -14,34 +13,22 @@ public class PlayerLoader {
 
     private static final ExecutorService executor = Executors.newFixedThreadPool(12);
 
-    private static final Map<String, RealPlayer> playerMap = new Hashtable<>();
+    private static final Map<String, RealPlayer> playerMap = new ConcurrentHashMap<>();
 
     public static void shutdown() {
         executor.shutdown();
     }
 
     public static void registerPlayer(Player player) {
-        executor.execute(() -> {
-            RealPlayer realPlayer = new RealPlayer(player);
-            playerMap.put(player.getName(), realPlayer);
-
-            MongoPlayer.downloadPlayerData(realPlayer);
-
-            Bukkit.getScheduler().runTask(MingLib.instance, () -> {
-                PlayerRegisterEvent event = new PlayerRegisterEvent(realPlayer);
-                Bukkit.getPluginManager().callEvent(event);
-            });
-        });
+        MongoPlayer.registerPlayer(player);
     }
 
     public static void unregisterPlayer(Player player) {
-        RealPlayer realPlayer = playerMap.get(player.getName());
-        playerMap.remove(player.getName());
+        MongoPlayer.unregisterPlayer(player);
+    }
 
-        MongoPlayer.saveAndUnloadPlayerData(realPlayer);
-
-        PlayerUnregisterEvent event = new PlayerUnregisterEvent(realPlayer);
-        Bukkit.getPluginManager().callEvent(event);
+    public static Map<String, RealPlayer> getPlayerMap() {
+        return playerMap;
     }
 
     public static Collection<RealPlayer> getRealPlayers() {

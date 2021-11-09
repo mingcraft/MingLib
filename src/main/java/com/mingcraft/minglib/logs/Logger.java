@@ -1,8 +1,6 @@
 package com.mingcraft.minglib.logs;
 
 import com.mingcraft.minglib.colors.Color;
-import com.mingcraft.minglib.events.log.LoggerRegisteredEvent;
-import com.mingcraft.minglib.events.log.LoggerUnregisteredEvent;
 import com.mingcraft.minglib.exceptions.log.CallUnregisteredLoggerException;
 import com.mingcraft.minglib.exceptions.log.LoggerRegisterFailedException;
 import org.bukkit.Bukkit;
