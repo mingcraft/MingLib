@@ -28,8 +28,6 @@ import java.util.concurrent.*;
  */
 public class MongoDB {
 
-    private static final ExecutorService executor = Executors.newFixedThreadPool(4);
-
     private static final String KEY_PLAYER = "uuid";
     private static final Gson gson = new GsonBuilder().create();
 
