@@ -109,8 +109,13 @@ public class MongoDB {
     public void updateOne(Document document, String key, Object value) {
         ExecutorService executor = Executors.newFixedThreadPool(4);
         executor.execute(() -> {
-            collection.deleteOne(Filters.eq(key, value));
-            collection.insertOne(document);
+            try {
+                collection.deleteOne(Filters.eq(key, value));
+                collection.insertOne(document);
+            } catch (Exception e) {
+                executor.shutdown();
+                e.printStackTrace();
+            }
         });
     }
 
@@ -123,8 +128,13 @@ public class MongoDB {
     public void updateMany(List<Document> documents, String key, Object value) {
         ExecutorService executor = Executors.newFixedThreadPool(4);
         executor.execute(() -> {
-            collection.deleteMany(Filters.eq(key, value));
-            collection.insertMany(documents);
+            try {
+                collection.deleteMany(Filters.eq(key, value));
+                collection.insertMany(documents);
+            } catch (Exception e) {
+                executor.shutdown();
+                e.printStackTrace();
+            }
         });
     }
 
@@ -136,8 +146,13 @@ public class MongoDB {
     public void updateMany(List<Document> documents, String key) {
         ExecutorService executor = Executors.newFixedThreadPool(4);
         executor.execute(() -> {
-            collection.deleteMany(Filters.exists(key));
-            collection.insertMany(documents);
+            try {
+                collection.deleteMany(Filters.exists(key));
+                collection.insertMany(documents);
+            } catch (Exception e) {
+                executor.shutdown();
+                e.printStackTrace();
+            }
         });
     }
 
@@ -148,8 +163,13 @@ public class MongoDB {
     public void updateAll(List<Document> documents) {
         ExecutorService executor = Executors.newFixedThreadPool(4);
         executor.execute(() -> {
-            collection.drop();
-            collection.insertMany(documents);
+            try {
+                collection.drop();
+                collection.insertMany(documents);
+            } catch (Exception e) {
+                executor.shutdown();
+                e.printStackTrace();
+            }
         });
     }
 
@@ -160,7 +180,12 @@ public class MongoDB {
     public void insertOne(Document document) {
         ExecutorService executor = Executors.newFixedThreadPool(4);
         executor.execute(() -> {
-            collection.insertOne(document);
+            try {
+                collection.insertOne(document);
+            } catch (Exception e) {
+                executor.shutdown();
+                e.printStackTrace();
+            }
         });
     }
 
@@ -171,7 +196,12 @@ public class MongoDB {
     public void insertMany(List<Document> documents) {
         ExecutorService executor = Executors.newFixedThreadPool(4);
         executor.execute(() -> {
-            collection.insertMany(documents);
+            try {
+                collection.insertMany(documents);
+            } catch (Exception e) {
+                executor.shutdown();
+                e.printStackTrace();
+            }
         });
     }
 
