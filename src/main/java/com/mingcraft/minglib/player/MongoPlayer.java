@@ -111,7 +111,15 @@ public class MongoPlayer {
             RealPlayer realPlayer = new RealPlayer(player);
             PlayerLoader.getPlayerMap().put(player.getName(), realPlayer);
 
-            MongoPlayer.downloadPlayerData(realPlayer);
+            AtomicInteger count = new AtomicInteger();
+            mongoPlayerMap.forEach((key, value) -> {
+                download(realPlayer, value);
+                count.getAndIncrement();
+            });
+            Bukkit.getLogger().log(Level.INFO, Color.colored(
+                    "&6[MongoPlayer] &a" + count +"&e of &3" +
+                            realPlayer.getPlayer().getName() + "&e's Data Download Complete."
+            ));
 
             Bukkit.getScheduler().runTask(MingLib.instance, () -> {
                 PlayerRegisterEvent event = new PlayerRegisterEvent(realPlayer);
@@ -123,7 +131,18 @@ public class MongoPlayer {
     public static void unregisterPlayer(Player player) {
         executor.execute(() -> {
             RealPlayer realPlayer = PlayerLoader.getPlayerMap().get(player.getName());
-            MongoPlayer.saveAndUnloadPlayerData(realPlayer);
+
+            AtomicInteger count = new AtomicInteger();
+            mongoPlayerMap.forEach((key, value) -> {
+                save(realPlayer, value);
+                unload(realPlayer, value);
+                count.getAndIncrement();
+            });
+            Bukkit.getLogger().log(Level.INFO, Color.colored(
+                    "&6[MongoPlayer] &a" + count +"&e of &3" + realPlayer.getPlayer().getName() +
+                            "&e's Data Save/Unload Complete."
+            ));
+
             PlayerLoader.getPlayerMap().remove(player.getName());
 
             Bukkit.getScheduler().runTask(MingLib.instance, () -> {
