@@ -144,4 +144,13 @@ public class PlayerListener implements Listener {
         }
     }
 
+    @EventHandler
+    public void onInteract(PlayerInteractEvent event) {
+        String name = event.getPlayer().getName();
+        Boolean state = playerLoadingMap.get(name);
+        if (state != null && state) {
+            event.setCancelled(true);
+        }
+    }
+
 }
