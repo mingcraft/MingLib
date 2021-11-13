@@ -201,6 +201,10 @@ public class ItemBuilder {
         return this;
     }
 
+    public ItemMeta getItemMeta() {
+        return itemMeta;
+    }
+
     public ItemStack build() {
         itemStack.setItemMeta(itemMeta);
         return itemStack;
