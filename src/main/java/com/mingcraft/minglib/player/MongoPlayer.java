@@ -152,6 +152,36 @@ public class MongoPlayer {
         });
     }
 
+    public static void unregisterPlayerWhenServerMove(Player player, String channel) {
+        executor.execute(() -> {
+            RealPlayer realPlayer = PlayerLoader.getPlayerMap().get(player.getName());
+
+            AtomicInteger count = new AtomicInteger();
+            mongoPlayerMap.forEach((key, value) -> {
+                save(realPlayer, value);
+                unload(realPlayer, value);
+                count.getAndIncrement();
+            });
+            Bukkit.getLogger().log(Level.INFO, Color.colored(
+                    "&6[MongoPlayer] &a" + count +"&e of &3" + realPlayer.getPlayer().getName() +
+                            "&e's Data Save/Unload Complete."
+            ));
+
+            PlayerLoader.getPlayerMap().remove(player.getName());
+
+            PlayerMover.moveServer(player, channel);
+            Bukkit.getLogger().log(Level.INFO, Color.colored(
+                    "&6[MongoPlayer] &3" + realPlayer.getPlayer().getName() +
+                            " &ehas moved to server &3" + channel
+            ));
+
+            Bukkit.getScheduler().runTask(MingLib.instance, () -> {
+                PlayerUnregisterEvent event = new PlayerUnregisterEvent(realPlayer);
+                Bukkit.getPluginManager().callEvent(event);
+            });
+        });
+    }
+
     public static void downloadPlayerData(RealPlayer player) {
         executor.execute(() -> {
             AtomicInteger count = new AtomicInteger();

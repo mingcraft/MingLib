@@ -24,12 +24,24 @@ public class PlayerListener implements Listener {
 
     @EventHandler
     public void onJoin(PlayerJoinEvent event) {
-        PlayerLoader.registerPlayer(event.getPlayer());
+        Player player = event.getPlayer();
+        if (!PlayerMover.isMoved(player)) {
+            PlayerLoader.unregisterPlayer(event.getPlayer());
+        }
+        else {
+            PlayerMover.removePlayerServerMoveState(player);
+        }
     }
 
     @EventHandler
     public void onQuit(PlayerQuitEvent event) {
-        PlayerLoader.unregisterPlayer(event.getPlayer());
+        Player player = event.getPlayer();
+        if (!PlayerMover.isMoved(player)) {
+            PlayerLoader.unregisterPlayer(event.getPlayer());
+        }
+        else {
+            PlayerMover.removePlayerServerMoveState(player);
+        }
     }
 
     @EventHandler

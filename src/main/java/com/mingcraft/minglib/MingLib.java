@@ -9,13 +9,16 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 public final class MingLib extends JavaPlugin {
 
+    public static final String BUNGEE_CHANNEL = "BungeeCord";
+
     public static FileConfiguration config;
     public static MingLib instance;
 
     @Override
     public void onEnable() {
-        instance = this;
+        registerInstance();
         registerConfig();
+        registerBungeeChannel();
         MongoDB.registerMongoDB();
         new PlayerListener(this);
     }
@@ -24,11 +27,24 @@ public final class MingLib extends JavaPlugin {
     public void onDisable() {
         MongoPlayer.shutdown();
         PlayerLoader.shutdown();
+        unregisterBungeeChannel();
+    }
+
+    private void registerInstance() {
+        instance = this;
     }
 
     private void registerConfig() {
         saveDefaultConfig();
         config = getConfig();
+    }
+
+    private void registerBungeeChannel() {
+        getServer().getMessenger().registerOutgoingPluginChannel(this, BUNGEE_CHANNEL);
+    }
+
+    private void unregisterBungeeChannel() {
+        getServer().getMessenger().unregisterOutgoingPluginChannel(this, BUNGEE_CHANNEL);
     }
 
 }
