@@ -4,6 +4,7 @@ import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
 import com.mingcraft.minglib.MingLib;
 import com.mingcraft.minglib.colors.Color;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
@@ -11,12 +12,20 @@ import java.util.List;
 
 public class PlayerMover {
 
-    private static List<String> connectedChannel = new ArrayList<>();
+    private static final List<String> CONNECTED_CHANNEL = new ArrayList<>();
     private static final List<String> movedPlayer = new ArrayList<>();
 
-    // ASM Connector 에서 초기화
-    public static void reloadConnectedChannel(List<String> channels) {
-        connectedChannel = channels;
+    public static void setConnectedChannel(List<String> channels) {
+        CONNECTED_CHANNEL.clear();
+        CONNECTED_CHANNEL.addAll(channels);
+    }
+
+    public static List<String> getConnectedChannel() {
+        return CONNECTED_CHANNEL;
+    }
+
+    public static boolean hasConnection(String channel) {
+        return CONNECTED_CHANNEL.contains(channel);
     }
 
     public static void enablePlayerServerMoveState(Player player) {
@@ -49,7 +58,7 @@ public class PlayerMover {
     }
 
     public static boolean isServerConnected(String channel) {
-        return connectedChannel.contains(channel.toUpperCase());
+        return CONNECTED_CHANNEL.contains(channel);
     }
 
 }
